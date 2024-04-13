@@ -1,8 +1,15 @@
 CC		= gcc
+
 CFLAGS	= -Wall -Werror -Wextra
+
 NAME	= push_swap
 
+LIBFT		=	libft/libft.a
+
+RM			=	rm -f
+
 SRC_PATH = src/
+
 OBJ_PATH = obj/
 
 SRC		= main.c \
@@ -13,6 +20,7 @@ SRC		= main.c \
 		sort_tiny.c sort.c \
 		position.c cost.c do_move.c \
 		utils.c
+		
 SRCS	= $(addprefix $(SRC_PATH), $(SRC))
 OBJ		= $(SRC:.c=.o)
 OBJS	= $(addprefix $(OBJ_PATH), $(OBJ))
@@ -30,10 +38,12 @@ $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
 clean:
-	rm -rf $(OBJ_PATH)
+	make clean -C libft
+	$(RM) $(OBJ_PATH)
 
 fclean: clean
-	rm -f $(NAME)
+    make fclean -C libft
+	$(RM) $(NAME)
 
 re: fclean all
 
