@@ -1,43 +1,77 @@
-NAME		=	push_swap
+CC		= gcc
+CFLAGS	= -Wall -Werror -Wextra
+NAME	= push_swap
 
-NAME_BONUS	=	checker
+SRC_PATH = src/
+OBJ_PATH = obj/
 
-CC			=	gcc
+SRC		= main.c \
+		input_check.c input_check_utils.c \
+		initialization.c \
+		stack.c \
+		swap.c push.c rotate.c reverse_rotate.c \
+		sort_tiny.c sort.c \
+		position.c cost.c do_move.c \
+		utils.c
+SRCS	= $(addprefix $(SRC_PATH), $(SRC))
+OBJ		= $(SRC:.c=.o)
+OBJS	= $(addprefix $(OBJ_PATH), $(OBJ))
+INCS	= -I ./includes/
 
-CFLAGS		=	-Wall -Wextra -Werror
+all: $(OBJ_PATH) $(NAME) 
 
-RM			=	rm -f
+$(OBJ_PATH)%.o: $(SRC_PATH)%.c
+	$(CC) $(CFLAGS) -c $< -o $@ $(INCS)
 
-SRC			=	push_swap.c
+$(OBJ_PATH):
+	mkdir $(OBJ_PATH)
 
-SRC_BONUS	=	checker.c
-
-LIBFT		=	libft/libft.a
-
-OBJ			=	$(SRC:.c=.o)
-
-OBJ_BONUS	=	$(SRC_BONUS:.c=.o)
-
-
-
-$(NAME):	$(OBJ)
-			make -C ./libft
-			$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT)
-
-all:		$(NAME)
+$(NAME): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
 clean:
-			make clean -C libft
-			${RM} $(OBJ) $(OBJ_BONUS)
+	rm -rf $(OBJ_PATH)
 
-fclean: 	clean
-			make fclean -C libft
-			${RM} $(NAME) $(NAME_BONUS) ${OBJ} $(OBJ_BONUS)
+fclean: clean
+	rm -f $(NAME)
 
-re:			fclean bonus
+re: fclean all
 
-bonus:		all $(OBJ_BONUS)
-			$(CC) $(CFLAGS) -o $(NAME_BONUS) $(OBJ_BONUS) $(LIBFT)
+test2:				$(NAME)	
+					$(eval ARG = $(shell shuf -i 0-100 -n 2))
+					./push_swap $(ARG) | ./checker_linux $(ARG)
+					@echo -n "Instructions: "
+					@./push_swap $(ARG) | wc -l
+
+test3:				$(NAME)	
+					$(eval ARG = $(shell shuf -i 0-100 -n 3))
+					./push_swap $(ARG) | ./checker_linux $(ARG)
+					@echo -n "Instructions: "
+					@./push_swap $(ARG) | wc -l
+
+test5:				$(NAME)	
+					$(eval ARG = $(shell shuf -i 0-5000 -n 5))
+					./push_swap $(ARG) | ./checker_linux $(ARG)
+					@echo -n "Instructions: "
+					@./push_swap $(ARG) | wc -l
+
+test100:			$(NAME)	
+					$(eval ARG = $(shell shuf -i 0-5000 -n 100))
+					./push_swap $(ARG) | ./checker_linux $(ARG)
+					@echo -n "Instructions: "
+					@./push_swap $(ARG) | wc -l
+
+test500:			$(NAME)	
+					$(eval ARG = $(shell shuf -i 0-5000 -n 500))
+					./push_swap $(ARG) | ./checker_linux $(ARG)
+					@echo -n "Instructions: "
+					@./push_swap $(ARG) | wc -l
+
+test1000:			$(NAME)	
+					$(eval ARG = $(shell shuf -i 0-5000 -n 1000))
+					./push_swap $(ARG) | ./checker_linux $(ARG)
+					@echo -n "Instructions: "
+					@./push_swap $(ARG) | wc -l
 
 
-.PHONY:		all clean fclean re
+.PHONY: all clean fclean re test2 test3 test5 test100 test500 test1000
