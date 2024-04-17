@@ -109,4 +109,21 @@ int main(int argc, char **argv)
         return 0;
     }
 
+    for (int i = 1; i < argc; i++)
+    {
+        int value = atoi(argv[i]);
+        stack = push(stack, value);
+    }
+
+    printf("Before sorting: ");
+    print_stack(stack);
+
+    stack = quicksort(stack);
+
+    printf("After sorting: ");
+    print_stack(stack);
+
+    free_stack(stack);
+
+    return 0;
 }
