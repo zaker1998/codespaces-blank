@@ -1,23 +1,37 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   push_swap.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mdussali <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/13 14:08:21 by mdussali          #+#    #+#             */
-/*   Updated: 2024/04/13 14:08:22 by mdussali         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include <stdio.h>
+#include <stdlib.h>
 
-// Function to check if the stack is sorted
-int is_sorted(t_stack *stack) {
-    while (stack && stack->next) {
-        if (stack->value > stack->next->value)
-            return 0; // Stack is not sorted
-        stack = stack->next;
+// Define the structure for a stack element
+typedef struct s_stack {
+    int value;
+    struct s_stack *next;
+} t_stack;
+
+// Function to push a new element onto the stack
+void push(t_stack **stack, int value) {
+    t_stack *new_node = malloc(sizeof(t_stack));
+    if (new_node == NULL) {
+        fprintf(stderr, "Error: Memory allocation failed\n");
+        exit(EXIT_FAILURE);
     }
-    return 1; // Stack is sorted
+    new_node->value = value;
+    new_node->next = *stack;
+    *stack = new_node;
+}
+
+// Function to print the list of instructions
+void print_instructions(char *instruction) {
+    printf("%s\n", instruction);
+}
+
+// Function to free memory allocated for the stack
+void free_stack(t_stack *stack) {
+    t_stack *temp;
+    while (stack != NULL) {
+        temp = stack;
+        stack = stack->next;
+        free(temp);
+    }
 }
 
 // Function to find the index of the minimum value in the stack
@@ -35,15 +49,6 @@ int find_min_index(t_stack *stack) {
         index++;
     }
     return min_index;
-}
-
-// Function to perform the 'sa' operation (swap the first two elements of stack 'a')
-void sa_operation(t_stack **stack_a) {
-    if (*stack_a && (*stack_a)->next) {
-        int temp = (*stack_a)->value;
-        (*stack_a)->value = (*stack_a)->next->value;
-        (*stack_a)->next->value = temp;
-    }
 }
 
 // Function to perform the 'ra' operation (rotate up all elements of stack 'a')
@@ -77,27 +82,53 @@ void rra_operation(t_stack **stack_a) {
 
 // Function to implement the push_swap algorithm
 void push_swap(t_stack **stack_a) {
-    if (is_sorted(*stack_a)) {
-        printf("Stack is already sorted!\n");
+    if (*stack_a == NULL)
         return;
-    }
 
     // Determine the optimal sequence of operations to sort the stack
-    // For simplicity, let's implement a basic sorting algorithm
-    while (!is_sorted(*stack_a)) {
+    while ((*stack_a)->next) {
         // Find the index of the minimum value in the stack
         int min_index = find_min_index(*stack_a);
         // Calculate the number of steps to move the minimum value to the top
         int steps_to_top = min_index;
-        if (min_index > (stack_size(*stack_a) / 2)) {
-            steps_to_top = stack_size(*stack_a) - min_index;
-            while (steps_to_top--)
-                rra_operation(stack_a); // Rotate the stack in the reverse direction
-        } else {
+        if (min_index > 0) {
+            steps_to_top = min_index;
             while (steps_to_top--)
                 ra_operation(stack_a); // Rotate the stack in the forward direction
+        } else {
+            while (steps_to_top--)
+                rra_operation(stack_a); // Rotate the stack in the reverse direction
         }
-        // Perform the 'pa' operation to push the minimum value to stack 'b'
-        pa_operation(stack_a, &stack_b);
+        // Perform the 'pb' operation to push the minimum value to stack 'b'
+        print_instructions("pb");
     }
+
+    // Now, stack 'a' has only one element, which is the maximum value
+    // Push all elements back to stack 'a' from stack 'b'
+    while (*stack_b) {
+        print_instructions("pa");
+        *stack_b = (*stack_b)->next;
+    }
+}
+
+int main(int argc, char **argv) {
+    if (argc < 2) {
+        fprintf(stderr, "Error: Not enough arguments\n");
+        return EXIT_FAILURE;
+    }
+
+    // Create the initial stack 'a' from the input arguments
+    t_stack *stack_a = NULL;
+    for (int i = argc - 1; i > 0; i--) {
+        int value = atoi(argv[i]);
+        push(&stack_a, value);
+    }
+
+    // Call the push_swap algorithm to generate the list of instructions
+    push_swap(&stack_a);
+
+    // Free the memory allocated for the stack
+    free_stack(stack_a);
+
+    return EXIT_SUCCESS;
 }
