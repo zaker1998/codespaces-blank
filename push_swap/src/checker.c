@@ -39,4 +39,34 @@ int is_sorted(t_stack *stack) {
     // Implement the logic to check if the stack is sorted
 }
 
+int main(int argc, char **argv) {
+    if (argc < 2) {
+        fprintf(stderr, "Error: Not enough arguments\n");
+        return EXIT_FAILURE;
+    }
 
+    // Create the initial stack 'a' from the input arguments
+    t_stack *stack_a = NULL;
+    for (int i = argc - 1; i > 0; i--) {
+        int value = atoi(argv[i]);
+        push(&stack_a, value);
+    }
+
+    // Read instructions from standard input and execute them
+    char instruction[4];
+    while (scanf("%3s", instruction) != EOF) {
+        execute_instruction(instruction, &stack_a);
+    }
+
+    // Check if the stack is sorted
+    if (is_sorted(stack_a)) {
+        printf("OK\n");
+    } else {
+        printf("KO\n");
+    }
+
+    // Free the memory allocated for the stack
+    free_stack(stack_a);
+
+    return EXIT_SUCCESS;
+}
